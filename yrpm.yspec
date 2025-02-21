@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: Package
+metadata:
+  name: yrpm
+  version: 0.0.1
+  maintainer:
+    - name: Paride Martino
+      email: paride.martino@protonmail.com
+spec:
+  arch:
+    - any
+    - amd64
+  source:
+    - url: https://github.com/paride5745/yrpm/archive/refs/tags/${pkgver}.zip
+  checksums:
+    sha512: SKIP
+  dependencies:
+    runtime:
+      - linux
+    build:
+      - rust
+    check:
+      - just
+  optionalDependencies:
+    - name: bar
+      description: not foo
+  conflicts:
+    - none
+  replaces:
+    - AUR
+  provides:
+    - yrpm
+  compatibility:
+    incompatible:
+      - debian
+    compatible:
+      - rhel
+      - fedora
+      - opensuse
+      - openmandriva
+  license:
+    - GPL-3.0-or-later
+  externalConnection: true
+  scripts:
+    prepare: |
+      cd "${pkgname}-${pkgver}"
+      ./autogen.sh
+      ./configure
+    build: |
+      cd "${pkgname}-${pkgver}"
+      make -j"${NCPU}"
+    check: |
+      cd "${pkgname}-${pkgver}"
+      make checks
+    package: |
+      cd "${pkgname}-${pkgver}"
+      make install DESTDIR="${pkgdir}"
+      install -Dm755 "${pkgname}" -t "${pkgdir}/usr/bin"
+    lifecycle:
+      preInstall: |
+        echo "Do pre-unpacking stuff here"
+      preUpgrade: |
+        echo "Do pre-unpacking stuff here"
+      preRemove: |
+        rm -rf somedir
+      postInstall: |
+        echo "Do post-unpacking stuff here"
+      postUpgrade: |
+        echo "Do post-unpacking stuff here"
+      postRemove: |
+        rm -rf somedir
